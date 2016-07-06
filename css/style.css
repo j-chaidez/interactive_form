@@ -192,6 +192,9 @@ button:hover {
 	background-color: #5e97b0;
 }
 
+.warning {
+	color: red;
+}
 /* ================================= 
   Helper Classes
 ==================================== */

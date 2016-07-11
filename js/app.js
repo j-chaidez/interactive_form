@@ -17,6 +17,8 @@ var animations = (function(_) {
 				if (targetStyle <= 0) {
 				// if the target style is less than or equal to zero, that means the options need to be expanded
 					target.style.height = "auto";
+					target.style.maxHeight = "200px";
+					target.style.overflowY = "scroll";
 				} else {
 				// else, collapse the target
 					target.style.height = "0px";
@@ -48,28 +50,48 @@ var animations = (function(_) {
 			// append txt to the target element
 			target.appendChild(txt);
 		},
-		
+		// adjustTotal is responsible for summing the total of the events and displaying it on the page
 		adjustTotal: function(cash) {
+			// target the 'activities' class
 		    var target = _.getElementsByClass("activities")[0];
+			// target the 'total' class
 			var pageTotal = _.getElementsByClass("total")[0];
+			// set an empty variable for the total
 			var total;
+			// check to see if the 'total' element exists
 			if (pageTotal) {
+				// if it does, parse the innerHTML for an integer, then add the cash parameter for the new total
 				total = parseInt(pageTotal.innerHTML) + parseInt(cash);
+				// set the innerHTML equal to total
 				pageTotal.innerHTML = total;
 			} else {
+				// if the element does not exist, it's time to create it; set total equal to zero
 				total = 0;
+				// since cash is passed in as a string, the function needs to parse it for an integer
 				total += parseInt(cash);
+				// create an h2 element
 				var el = document.createElement("H2");
+				// create a span element
 				var span = document.createElement("SPAN");
+				// set the h2 font size
 				el.style.fontSize = "22px";
+				// set the h2 display style to inline-block
 				el.style.display = "inline-block";
+				// set the span's innerHTML to "Total: $"
 				span.innerHTML = "Total: $";
+				// change the fontWeight to bold
 				span.style.fontWeight = "bold";
+				// change the span font size to 20px
 				span.style.fontSize = "20px";
+				// add the class of "total" to the h2 element
 				_.addClass(el, "total");
+				// create a text node with 'total' attached to it
 				var txt = document.createTextNode(total);
+				// append text as a child to the h2 element
 				el.appendChild(txt);
+				// append the span to the target
 				target.appendChild(span);
+				// append the h2 to the target
 				target.appendChild(el);
 			}
 		}
@@ -78,75 +100,122 @@ var animations = (function(_) {
 	
 }(Core));
 
+// create the app module
 var app = (function(_) {
+	// create an empty array
 	var designArray = [];
+	// return an object as the API for app
 	return {
-		
+		// the init function is responsible for creating initial state
 		init: function() {
+			// focus on the name input
 			document.getElementById("name").focus();
-			document.getElementById("job-role").style.display = "none";
+			// set the 'other-role' display style to none
+			document.getElementById("other-role").style.display = "none";
+			// set the opacity of the colors-js-puns div to 0
 			document.getElementById("colors-js-puns").style.opacity = 0;
+			// hide the paypal div
 			document.getElementById("paypal").style.display = "none";
+			// hide the bitcoin div
 			document.getElementById("bitcoin").style.display = "none";
+			// call the styleDropDowns function that is contained within this object
 			this.styleDropDowns();
+			// set designArray equal to clearColors; a function contained within this object
 			designArray = this.clearColors();
 		},
-		
+		// styleDropDowns is responsible for replacing the standard select boxes with custom ones
 		styleDropDowns: function() {
+			// create an empty widths array
 			var widths = [];
+			// create the variables that the function uses
 			var dropDownParent, dropDownDiv, optionsBlock, firstText, firstTextElement;
+			// get all of the select elements in the document
 			var dropDowns = document.getElementsByTagName("select");
+			// initiate a for loop to iterate over the dropdowns
 			for (var i = 0; i < dropDowns.length; i++) {
+				// get the parent of the current select element
 				dropDownParent = dropDowns[i].parentElement;
+				// create new div element that will act as the pseudo-select
 				dropDownDiv = document.createElement("DIV");
+				// create the options area of the new select box
 				optionsBlock = document.createElement("DIV");
+				// get the innerHTML of the first child node
 				firstText = dropDowns[i].childNodes[1].innerHTML;
+				// create a new P element to be appended to the div
 				firstTextElement = document.createElement("P");
+				// set the innerHTML of that element equal to firstText
 				firstTextElement.innerHTML = firstText;
+				// set the tab index of the div so you can tab through it
 				dropDownDiv.tabIndex = "0";
+				// add the class options to the options div
 				_.addClass(optionsBlock, 'options');
+				// call the getOptions function
 				this.getOptions(dropDowns[i], optionsBlock);
+				// add the class of 'select' to the new dropDownDiv
 				_.addClass(dropDownDiv, "select");
+				// set the id of the new dropdown to the currently selected dropdown id
 				dropDownDiv.id = dropDowns[i].id;
+				// set the dropdown id equal to blank
 				dropDowns[i].id = "";
+				// push the width of the currently selected dropdown element into the widths array
 				widths.push(dropDowns[i].offsetWidth);
+				// append the options block to the new dropDownDiv
 				dropDownDiv.appendChild(optionsBlock);
+				// append the first text element to the dropDownDiv
 				dropDownDiv.appendChild(firstTextElement);
+				// insert the newly created dropDownDiv before the currently selected select element
 				dropDownParent.insertBefore(dropDownDiv, dropDowns[i]);
+				// hide the currently selected select element
 				dropDowns[i].style.position = "absolute";
 				dropDowns[i].style.left = "-10000px";
 			}
-			
+			// set the width of each newly created select element
 			dropDowns = _.getElementsByClass('select');
 			for (i = 0; i < widths.length; i++) {
 				dropDowns[i].style.width = String(parseInt(widths[i] + 10) + "px");
 			}
 		},
-		
+		// getOptions is responsible for getting the options of each select element; pass in the select element and the options div
 		getOptions: function(sel, div) {
+			// get the options from the sel parameter
 			var options = sel.children;
+			// initiate a for loop to iterate through the children
 			for (var opt in options) {
+				// if the currently select option is not equal to undefined
 				if (options[opt].innerHTML !== undefined) { 
+					// create a new div element
 					var txt = document.createElement("DIV");
+					// set the tab index for usability
 					txt.tabIndex = "0";
+					// add the 'option' class to the div element
 					_.addClass(txt, "option");
+					// append the innerHTML to the new the div
 					txt.appendChild(document.createTextNode(options[opt].innerHTML));
+					// append txt to the div parameter
 					div.appendChild(txt);
 				}
 			}
 		},
 		
+		// checkJobRoles is responsible for checking to see if the other option is selected in the job titles
 		checkJobRoles: function(el) {
+			// this very long statement just finds the top-most level parent element
 			var topLevel = el.parentElement.parentElement.parentElement.childNodes[1].innerHTML;
+			// check to see if 'Other' is selected and the top-most element is equal to 'Basic Info'
 			if (el.innerHTML === "Other" && topLevel === "Basic Info") {
-				document.getElementById("job-role").style.display = "block";
+			// if it is, set the display equal to block
+				document.getElementById("other-role").style.display = "block";
 			} else if (el.innerHTML !== "Other" && topLevel === "Basic Info") {
-				document.getElementById("job-role").style.display = "none";
+			// if not, set the style display equal to none
+				document.getElementById("other-role").style.display = "none";
 			}
 		},
 		
+		// clearColors is responsible for clearing out the colors inside of the colors div
 		clearColors: function() {
+			// create an empty array
 			var arr = [];
+			// 
 			var el = document.getElementById("colors-js-puns").childNodes[3].childNodes[0].childNodes;
 			for (var i = 0; i < el.length; i++) {
 				arr.push(el[i].innerHTML);
@@ -159,7 +228,7 @@ var app = (function(_) {
 		fillColors: function(el) {
 			var f = function() {
 				animations.addTextToParent(this);
-			}
+			};
 			var patt;
 			var str = el.innerHTML.slice(8, el.innerHTML.length);
 			var target = document.getElementById("colors-js-puns").childNodes[3].childNodes[0];
@@ -285,6 +354,10 @@ var app = (function(_) {
 		
 		verifyCreditCard: function(input) {
 			
+			if (input.length <= 0) {
+				return false;
+			}
+			
 			var creditCardNumber = input.split("").reverse();
 			var arr = creditCardNumber.map(function(number, index) {
 				var twice = number * 2;
@@ -336,6 +409,10 @@ var events = (function(_) {
 	var checkboxes = document.getElementsByTagName("input");
 	var labels = document.getElementsByTagName("label");
 	var sels = _.getElementsByClass('select');
+	var name = document.getElementById("name");
+	var warn = document.createElement("LABEL");
+	var childNodes, exists;
+	warn.className = "warning";
 	
 	return {
 		
@@ -423,91 +500,138 @@ var events = (function(_) {
 		checkBoxListener: function() {
 			app.totalEvents(this.parentElement, this);
 		},
-		
-		checkInputs: function(e) {
+
+		checkName: function(e) {
 			var name = document.getElementById("name");
-			var warn = document.createElement("LABEL");
-			var email = document.getElementById("mail");
-			var creditCardDiv = document.getElementById("credit-card");
-			var creditCard = document.getElementById("cc-num");
-			var childNodes, i, exists;
-			warn.className = "warning";
-			
+			var nameWarning = document.createElement("LABEL");
 			if (!app.verifyName(name.value)) {
 				exists = false;
 				childNodes = name.parentNode.children;
-				var nameWarning = document.createElement("LABEL");
 				nameWarning.innerHTML = "Please enter your name";
 				nameWarning.className = "warning";
 				e.preventDefault();
-				for (i = 0; i < childNodes.length; i++) {
-					if (childNodes[i].className === "warning" && childNodes[i].innerHTML === "Please enter your name") {
-						childNodes[i].innerHTML = "Please enter your name";
-						exists = true;
-					}
-				}
+				events.findLabel(childNodes, "Please enter your name");
 				if (exists === false) {
 					name.parentNode.insertBefore(nameWarning, name);
 				}
 			}
-			
+		},
+		
+		checkEmail: function(e) {
+			var email = document.getElementById("mail");
+			var emailWarning = document.createElement("LABEL");
 			if (!app.verifyEmail(email.value)) {
 				exists = false;
-				childNodes = email.parentNode.children;
-				var emailWarning = document.createElement("LABEL");
-				emailWarning.innerHTML = "Please enter an e-mail";
+				childNodes = name.parentNode.children;
+				emailWarning.innerHTML = "Please enter a valid e-mail address";
 				emailWarning.className = "warning";
 				e.preventDefault();
-				for (i = 0; i < childNodes.length; i++) {
-					if (childNodes[i].className === "warning" && childNodes[i].innerHTML === "Please enter an e-mail") {
-						childNodes[i].innerHTML = "Please enter an e-mail";
-						exists = true;
-					}
-				}
+				events.findLabel(childNodes, "Please enter a valid e-mail address");
 				if (exists === false) {
 					name.parentNode.insertBefore(emailWarning, email);
 				}
 			}
+		},
+		
+		checkEvents: function(e) {
 			
-			if (_.getComputedStyle(creditCardDiv, "display") !== "none") {
-				exists = false;
-				var zCode = document.getElementById("zip");
-				var cvv = document.getElementById("cvv");
-				var ccWarn = document.createElement("LABEL");
-				var ccParent = creditCard.parentNode;
-				childNodes = ccParent.children;
-				ccWarn.innerHTML = "Please enter valid credit card information";
-				ccWarn.className = "warning";
-				if (creditCard.value === "") {
-					e.preventDefault();
-					ccParent.removeChild(creditCard.parentNode.childNodes[1]);
-					for (i = 0; i < childNodes,length; i++) {
-						if (childNodes[i].className === "warning" && childNodes[i].innerHTML === "Please enter valid credit card information") {
-							childNodes[i].innerHTML = "Please enter valid credit card information";
-							exists = true;
-						}
-					}
-					if (exists === false) {
-						creditCard.parentNode.insertBefore(ccWarn, creditCard);
-					}
-					
-				} else if (!app.verifyCreditCard(creditCard.value) ||
-						   !app.verifyZipCode(zCode.value) ||
-						   !app.verifyCVV(cvv.value)) {
-					ccParent.removeChild(creditCard.parentNode.childNodes[1]);
-					e.preventDefault();
-					for (i = 0; i < childNodes.length; i++) {
-						if (childNodes[i].className === "warning" && childNodes[i].innerHTML === "Please enter valid credit card information") {
-							childNodes[i].innerHTML = "Please enter valid credit card information";
-							exists = true;
-						}
-					}
-					if (exists === false) {
-						creditCard.parentNode.insertBefore(ccWarn, creditCard);
+			var checked = false;
+			exists = false;
+			var activities = _.getElementsByClass("activities")[0];
+			var checkWarning = document.createElement("LABEL");
+			checkWarning.innerHTML = "Please select an event";
+			checkWarning.className = "warning";
+			for (var i = 0; i < checkboxes.length; i++) {
+				if (checkboxes[i].type === "checkbox") {
+					console.log(checkboxes[i].checked);
+					if (checkboxes[i].checked === true) {
+						checked = true;
 					}
 				}
 			}
-		}
+			
+			if (!checked) {
+				e.preventDefault();
+				for (i = 0; i < activities.children.length; i++) {
+					if (activities.children[i].className === "warning") {
+						activities.children[i].innerHTML = "Please select an event";
+						exists = true;
+					}
+				}
+				
+				if (exists === false) {
+					activities.insertBefore(checkWarning, activities.firstChild);
+				}
+			}
+			
+		},
+		
+		checkPaymentType: function(e) {
+			exists = false;
+			var payment = document.getElementById("payment");
+			var paymentWarning = document.createElement("LABEL");
+			paymentWarning.innerHTML = "Please select a payment type";
+			paymentWarning.className = "warning";
+			if (payment.lastChild.innerHTML === "Select Payment Method") {
+				e.preventDefault();
+				for (var i = 0; i < payment.parentNode.children.length; i++) {
+					if (payment.parentNode.children[i].className === "warning") {
+						payment.parentNode.children[i].innerHTML = "Please select a payment type";
+						exists = true;
+					}
+				}
+				if (exists === false) {
+					payment.parentNode.insertBefore(paymentWarning, payment);
+				}
+			}
+		},
+		
+		checkCreditCard: function(e) {
+			exists = false;
+			var creditCard = document.getElementById("cc-num");
+			var zCode = document.getElementById("zip");
+			var cvv = document.getElementById("cvv");
+			var creditCardDiv = document.getElementById("credit-card");
+			var creditCardWarn = document.createElement("LABEL");
+			creditCardWarn.className = "warning";
+			creditCardWarn.innerHTML = "Please enter a valid credit card number";
+			
+			if (creditCardDiv.style.display !== "none") {
+				if (!app.verifyCreditCard(creditCard.value) || !app.verifyZipCode(zCode.value) || !app.verifyCVV(cvv.value)) {
+					e.preventDefault();
+					creditCardDiv.removeChild(creditCardDiv.childNodes[0]);
+					
+					for (var i = 0; i < creditCardDiv.children.length; i++) {
+						if (creditCardDiv.children[i].className === "warning") {
+							creditCardDiv.children[i].innerHTML = "Please enter a valid credit card number";
+							exists = true;
+						}
+					}
+					
+					if (exists === false) {
+						creditCardDiv.insertBefore(creditCardWarn, creditCardDiv.children[0]);
+					}
+				}
+			}
+		},
+		
+		findLabel: function(child, txt) {
+			for (var i = 0; i < child.length; i++) {
+				if (childNodes[i].className === "warning" && childNodes[i].innerHTML === txt) {
+					console.log(childNodes[i].innerHTML);
+					childNodes[i].innerHTML = txt;
+					exists = true;
+				}
+			}
+		},
+		
+		checkInputs: function(e) {
+			events.checkName(e);
+			events.checkEmail(e);
+			events.checkEvents(e);
+			events.checkPaymentType(e);
+			events.checkCreditCard(e);
+		},
 	};
 	
 }(Core));
